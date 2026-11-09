@@ -1,0 +1,885 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MiraLuna: Game Edukasi Imut 🌸</title>
+    <style>
+        :root {
+            --primary-pink: #ff6584;
+            --light-pink: #ffe4e1;
+            --soft-bg: linear-gradient(135deg, #ff9a9e 0%, #fecfef 99%);
+            --card-bg: #ffffff;
+            --text-color: #555555;
+            --button-hover: #ff476f;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--soft-bg);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: var(--text-color);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .game-container {
+            background: var(--card-bg);
+            padding: 25px 30px;
+            border-radius: 25px;
+            box-shadow: 0 10px 25px rgba(255, 101, 132, 0.3);
+            width: 100%;
+            max-width: 480px;
+            text-align: center;
+            border: 4px solid #fff;
+            box-sizing: border-box;
+            z-index: 2;
+        }
+
+        h1 {
+            color: var(--primary-pink);
+            margin-bottom: 8px;
+            font-size: 20px;
+        }
+
+        p.subtitle {
+            font-size: 13px;
+            color: #888;
+            margin-bottom: 20px;
+        }
+
+        .menu-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+
+        .btn-menu {
+            width: 100%;
+            background-color: #fff;
+            border: 2px solid var(--primary-pink);
+            color: var(--primary-pink);
+            padding: 13px;
+            font-size: 15px;
+            font-weight: bold;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-menu:hover {
+            background-color: var(--primary-pink);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 101, 132, 0.4);
+        }
+
+        .btn-back {
+            background-color: #f1f3f5;
+            color: #868e96;
+            border: none;
+            padding: 10px;
+            font-size: 13px;
+            font-weight: bold;
+            border-radius: 12px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 5px;
+            transition: background 0.2s;
+        }
+
+        .btn-back:hover {
+            background-color: #e9ecef;
+            color: #495057;
+        }
+
+        .btn-restart, .btn-option, .btn-hint {
+            width: 100%;
+            background-color: var(--primary-pink);
+            color: white;
+            border: none;
+            padding: 12px;
+            font-size: 15px;
+            font-weight: bold;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-sizing: border-box;
+        }
+
+        .btn-restart:hover {
+            background-color: var(--button-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 101, 132, 0.4);
+        }
+
+        .top-info-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            font-size: 13px;
+            font-weight: bold;
+            color: #ff476f;
+            background: #fff0f3;
+            padding: 8px 12px;
+            border-radius: 10px;
+        }
+
+        .timer-box {
+            background: #ff476f;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 8px;
+            font-size: 12px;
+        }
+
+        .question-box {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            background: var(--light-pink);
+            padding: 15px;
+            border-radius: 15px;
+            color: #d6336c;
+            word-wrap: break-word;
+            line-height: 1.4;
+        }
+
+        .options-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .btn-option {
+            background-color: #fff;
+            border: 2px solid var(--primary-pink);
+            color: var(--primary-pink);
+            text-align: left;
+            padding: 11px 15px;
+            font-size: 14px;
+        }
+
+        .btn-option:hover:not(:disabled) {
+            background-color: var(--primary-pink);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 101, 132, 0.4);
+        }
+
+        .btn-hint {
+            background-color: #ffd43b;
+            color: #e67700;
+            font-size: 13px;
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 2px dashed #f59f00;
+        }
+
+        .btn-hint:hover:not(:disabled) {
+            background-color: #fcc419;
+            transform: translateY(-1px);
+        }
+
+        .btn-hint:disabled {
+            background-color: #f1f3f5;
+            color: #adb5bd;
+            border-color: #dee2e6;
+            cursor: not-allowed;
+        }
+
+        .page { display: none; }
+        .page.active { display: block; }
+
+        .feedback {
+            font-weight: bold;
+            font-size: 13px;
+            min-height: 18px;
+        }
+
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            50% { transform: translateX(5px); }
+            75% { transform: translateX(-5px); }
+            100% { transform: translateX(0); }
+        }
+        .shake { animation: shake 0.4s ease-in-out; }
+
+        .floating-star {
+            position: absolute;
+            font-size: 24px;
+            pointer-events: none;
+            animation: floatUp 1.2s ease-out forwards;
+            z-index: 10;
+        }
+
+        @keyframes floatUp {
+            0% { transform: translateY(0) scale(0.5) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(-120px) scale(1.4) rotate(360deg); opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="game-container" id="main-card">
+        
+        <!-- HALAMAN 1: PILIH MODE -->
+        <div id="page-mode" class="page active">
+            <h1>🌸 MiraLuna: Game Edukasi 🌸</h1>
+            <p class="subtitle">Pilih mode permainan yang kamu inginkan!</p>
+            <div class="menu-grid">
+                <button class="btn-menu" onclick="playSound('click'); selectMode('solo')">👤 Main Sendiri (Solo)</button>
+                <button class="btn-menu" onclick="playSound('click'); selectMode('duo')">👥 Main Berdua (Duo Bergiliran)</button>
+            </div>
+        </div>
+
+        <!-- HALAMAN 2: PILIH JENJANG -->
+        <div id="page-level" class="page">
+            <h1>🎓 Pilih Jenjang Sekolah</h1>
+            <p class="subtitle">Sesuaikan dengan tingkat pendidikanmu</p>
+            <div class="menu-grid">
+                <button class="btn-menu" onclick="playSound('click'); selectLevel('sd')">🎒 Sekolah Dasar (SD)</button>
+                <button class="btn-menu" onclick="playSound('click'); selectLevel('smp')">🏫 Sekolah Menengah Pertama (SMP)</button>
+                <button class="btn-menu" onclick="playSound('click'); selectLevel('sma')">🏛️ Sekolah Menengah Atas (SMA)</button>
+            </div>
+            <button class="btn-back" onclick="playSound('click'); goToPage('page-mode')">⬅️ Kembali</button>
+        </div>
+
+        <!-- HALAMAN 3: PILIH MATA PELAJARAN -->
+        <div id="page-subject" class="page">
+            <h1>📚 Pilih Mata Pelajaran</h1>
+            <p class="subtitle">Apa pelajaran favoritmu hari ini?</p>
+            <div class="menu-grid">
+                <button class="btn-menu" onclick="playSound('click'); selectSubject('matematika')">🔢 Matematika</button>
+                <button class="btn-menu" onclick="playSound('click'); selectSubject('bahasa')">📖 Bahasa Indonesia</button>
+                <button class="btn-menu" onclick="playSound('click'); selectSubject('inggris')">🇬🇧 Bahasa Inggris</button>
+                <button class="btn-menu" onclick="playSound('click'); selectSubject('sains')">🔬 Sains / IPA</button>
+                <button class="btn-menu" onclick="playSound('click'); selectSubject('sejarah')">📜 Sejarah & IPS</button>
+            </div>
+            <button class="btn-back" onclick="playSound('click'); goToPage('page-level')">⬅️ Kembali</button>
+        </div>
+
+        <!-- HALAMAN 4: GAME / KUIS UTAMA -->
+        <div id="page-quiz" class="page">
+            <h1 id="quiz-title">🌸 Kuis Desa Pelangi 🌸</h1>
+            <div class="top-info-bar">
+                <span id="info-left">Soal 1/20</span>
+                <span class="timer-box">⏱️ <span id="time-left">15</span>s</span>
+                <span id="info-right">Skor: 0</span>
+            </div>
+
+            <button class="btn-hint" id="btn-hint" onclick="playSound('click'); useHint()">💡 Bantuan 50:50 (Sisa: <span id="hint-count">1</span>)</button>
+
+            <div class="question-box" id="question-text">Pertanyaan...</div>
+            <div class="options-container" id="options-container"></div>
+            <div class="feedback" id="feedback"></div>
+        </div>
+
+        <!-- HALAMAN 5: HASIL AKHIR -->
+        <div id="page-result" class="page">
+            <h1>✨ Yey, Selesai! ✨</h1>
+            <p id="final-score-text" style="font-size: 15px; margin: 15px 0;"></p>
+            <p id="high-score-text" style="font-size: 14px; font-weight: bold; color: #e67700; margin-bottom: 10px;"></p>
+            <p id="congrats-message" style="font-size: 13px; margin-bottom: 15px;"></p>
+            <button class="btn-restart" onclick="playSound('click'); goToPage('page-mode')">Pilih Menu Utama 🌸</button>
+        </div>
+
+    </div>
+
+    <script>
+        // --- SISTEM AUDIO OTOMATIS ---
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        function playSound(type) {
+            if (audioCtx.state === 'suspended') { audioCtx.resume(); }
+            const osc = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            osc.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+
+            let now = audioCtx.currentTime;
+            if (type === 'click') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(400, now);
+                osc.frequency.exponentialRampToValueAtTime(800, now + 0.08);
+                gainNode.gain.setValueAtTime(0.1, now);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.08);
+                osc.start(now);
+                osc.stop(now + 0.08);
+            } else if (type === 'correct') {
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(523.25, now);
+                osc.frequency.setValueAtTime(659.25, now + 0.1);
+                osc.frequency.setValueAtTime(783.99, now + 0.2);
+                gainNode.gain.setValueAtTime(0.15, now);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
+                osc.start(now);
+                osc.stop(now + 0.4);
+            } else if (type === 'wrong') {
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(200, now);
+                osc.frequency.linearRampToValueAtTime(100, now + 0.25);
+                gainNode.gain.setValueAtTime(0.15, now);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
+                osc.start(now);
+                osc.stop(now + 0.25);
+            }
+        }
+
+        // --- ANIMASI BINTANG MELAYANG ---
+        function spawnFloatingStars(event) {
+            let x = event ? event.clientX : window.innerWidth / 2;
+            let y = event ? event.clientY : window.innerHeight / 2;
+
+            for (let i = 0; i < 5; i++) {
+                let star = document.createElement('div');
+                star.className = 'floating-star';
+                star.textContent = i % 2 === 0 ? '⭐' : '🌟';
+                
+                let offsetX = (Math.random() - 0.5) * 100;
+                let offsetY = (Math.random() - 0.5) * 50;
+                
+                star.style.left = (x + offsetX) + 'px';
+                star.style.top = (y + offsetY) + 'px';
+                
+                document.body.appendChild(star);
+                setTimeout(() => star.remove(), 1200);
+            }
+        }
+
+        // --- DATABASE SOAL (MASING-MASING 20 SOAL BERBEDA) ---
+        const databaseSoal = {
+            matematika: {
+                sd: [
+                    { q: "Berapa hasil dari 7 + 8?", options: ["14", "15", "16", "17"], a: "15" },
+                    { q: "Berapa hasil dari 12 - 4?", options: ["7", "8", "9", "6"], a: "8" },
+                    { q: "Hasil dari 5 × 6 adalah...", options: ["25", "30", "35", "20"], a: "30" },
+                    { q: "Berapa hasil dari 20 ÷ 4?", options: ["4", "5", "6", "3"], a: "5" },
+                    { q: "Berapa nilai tempat angka 7 pada bilangan 375?", options: ["Ratusan", "Puluhan", "Satuan", "Ribuan"], a: "Puluhan" },
+                    { q: "Berapa hasil dari 9 + 9?", options: ["16", "18", "20", "17"], a: "18" },
+                    { q: "Ibu membeli 24 buah jeruk, lalu diberikan kepada Ani 6 buah. Sisa jeruk ibu adalah...", options: ["16", "18", "20", "14"], a: "18" },
+                    { q: "Sebuah segitiga memiliki sisi sebanyak...", options: ["2", "3", "4", "5"], a: "3" },
+                    { q: "Angka romawi untuk 10 adalah...", options: ["V", "X", "L", "C"], a: "X" },
+                    { q: "Hasil dari 15 + 10 - 5 adalah...", options: ["18", "20", "22", "25"], a: "20" },
+                    { q: "Berapa jumlah sudut dalam sebuah persegi?", options: ["90°", "180°", "360°", "270°"], a: "360°" },
+                    { q: "Jika 1 minggu ada 7 hari, berapa hari dalam 4 minggu?", options: ["21", "28", "30", "32"], a: "28" },
+                    { q: "Berapa hasil dari 8 × 7?", options: ["54", "56", "64", "48"], a: "56" },
+                    { q: "Berapa hasil dari 45 ÷ 9?", options: ["4", "5", "6", "7"], a: "5" },
+                    { q: "Bilangan kelipatan 4 yang kurang dari 15 adalah...", options: ["4, 8, 12", "2, 4, 6, 8", "5, 10, 15", "3, 6, 9"], a: "4, 8, 12" },
+                    { q: "Pukul 08.30 pagi jika ditulis dalam format 24 jam adalah...", options: ["08.30", "18.30", "20.30", "10.30"], a: "08.30" },
+                    { q: "Berapa meter dalam 3 kilometer?", options: ["30 m", "300 m", "3.000 m", "30.000 m"], a: "3.000 m" },
+                    { q: "Sebuah buku harganya Rp5.000. Jika Budi membeli 3 buku, ia harus membayar...", options: ["Rp10.000", "Rp15.000", "Rp20.000", "Rp25.000"], a: "Rp15.000" },
+                    { q: "Berapa hasil dari 50 - 18?", options: ["32", "34", "28", "30"], a: "32" },
+                    { q: "Pecahan senilai dengan 1/2 adalah...", options: ["2/4", "1/3", "3/4", "2/5"], a: "2/4" }
+                ],
+                smp: [
+                    { q: "Berapa hasil dari -15 + 28?", options: ["13", "-13", "43", "-43"], a: "13" },
+                    { q: "Berapa hasil dari -20 - 15?", options: ["-5", "5", "-35", "35"], a: "-35" },
+                    { q: "Berapa nilai dari 3² + 4²?", options: ["14", "25", "49", "12"], a: "25" },
+                    { q: "Bentuk sederhana dari 2x + 3x - x adalah...", options: ["4x", "5x", "6x", "3x"], a: "4x" },
+                    { q: "Jika f(x) = 2x + 3, maka nilai dari f(4) adalah...", options: ["10", "11", "12", "13"], a: "11" },
+                    { q: "Luas lingkaran dengan jari-jari 7 cm adalah... (π = 22/7)", options: ["154 cm²", "616 cm²", "44 cm²", "88 cm²"], a: "154 cm²" },
+                    { q: "Hasil dari (2³)⁴ adalah...", options: ["2¹²", "2⁷", "2²", "16"], a: "2¹²" },
+                    { q: "Gradien garis dengan persamaan y = 3x + 5 adalah...", options: ["3", "5", "-3", "-5"], a: "3" },
+                    { q: "Akar kuadrat dari 196 adalah...", options: ["12", "13", "14", "15"], a: "14" },
+                    { q: "Berapa hasil dari -8 × (-6)?", options: ["-48", "48", "-14", "14"], a: "48" },
+                    { q: "Keliling persegi panjang dengan panjang 12 cm dan lebar 8 cm adalah...", options: ["40 cm", "96 cm", "20 cm", "48 cm"], a: "40 cm" },
+                    { q: "Penyelesaian dari persamaan x + 5 = 12 adalah...", options: ["5", "7", "12", "17"], a: "7" },
+                    { q: "Median dari data: 7, 5, 8, 6, 9 adalah...", options: ["6", "7", "8", "7.5"], a: "7" },
+                    { q: "Peluang muncul angka pada pelemparan sebuah mata uang logam adalah...", options: ["1/4", "1/2", "1", "3/4"], a: "1/2" },
+                    { q: "Besar sudut penyiku dari sudut 40° adalah...", options: ["50°", "140°", "90°", "180°"], a: "50°" },
+                    { q: "Hasil dari 3/4 + 1/2 adalah...", options: ["4/6", "5/4", "4/8", "2/3"], a: "5/4" },
+                    { q: "Berapa nilai x jika 2x - 4 = 10?", options: ["5", "6", "7", "8"], a: "7" },
+                    { q: "Banyak titik sudut pada limas segi empat adalah...", options: ["4", "5", "8", "6"], a: "5" },
+                    { q: "Nilai dari sin 30° adalah...", options: ["0", "0.5", "1", "0.86"], a: "0.5" },
+                    { q: "FPB dari 24 dan 36 adalah...", options: ["6", "8", "12", "18"], a: "12" }
+                ],
+                sma: [
+                    { q: "Nilai diskriminan dari x² - 5x + 6 = 0?", options: ["1", "4", "25", "49"], a: "1" },
+                    { q: "Turunan pertama dari f(x) = 3x² - 4x + 5 adalah...", options: ["6x - 4", "3x - 4", "6x² - 4", "6x + 4"], a: "6x - 4" },
+                    { q: "Nilai dari lim (x → 2) (3x² - 2x) adalah...", options: ["6", "8", "10", "12"], a: "8" },
+                    { q: "Integral dari ∫ 2x dx adalah...", options: ["x² + C", "2x² + C", "x + C", "2x + C"], a: "x² + C" },
+                    { q: "Jika log 2 = 0,301 dan log 3 = 0,477, maka log 6 adalah...", options: ["0,778", "0,176", "1,431", "0,500"], a: "0,778" },
+                    { q: "Suku ke-10 dari barisan aritmatika: 3, 5, 7, 9, ... adalah...", options: ["19", "21", "23", "25"], a: "21" },
+                    { q: "Jumlah tak hingga dari deret geometri: 8 + 4 + 2 + 1 + ... adalah...", options: ["12", "16", "20", "24"], a: "16" },
+                    { q: "Nilai dari cos 60° adalah...", options: ["0", "0.5", "1", "0.86"], a: "0.5" },
+                    { q: "Jika matriks A = [[1, 2], [3, 4]], berapa determinannya?", options: ["-2", "2", "10", "-10"], a: "-2" },
+                    { q: "Banyak susunan kata dari kata 'MATEMATIKA' adalah...", options: ["151.200", "362.880", "50.400", "75.600"], a: "151.200" },
+                    { q: "Invers dari fungsi f(x) = 2x + 4 adalah...", options: ["(x - 4)/2", "(x + 4)/2", "2x - 4", "x/2 - 2"], a: "(x - 4)/2" },
+                    { q: "Nilai dari 5! (faktorial) adalah...", options: ["60", "120", "24", "720"], a: "120" },
+                    { q: "Diketahui vektor a = (2, 3) dan b = (4, -1). Hasil dari a · b adalah...", options: ["5", "8", "11", "14"], a: "5" },
+                    { q: "Penyelesaian dari pertidaksamaan |x - 2| < 3 adalah...", options: ["-1 < x < 5", "x < -1 atau x > 5", "-5 < x < 1", "1 < x < 5"], a: "-1 < x < 5" },
+                    { q: "Asimtot datar dari fungsi f(x) = (2x + 1)/(x - 3) adalah...", options: ["y = 2", "y = 1", "y = 3", "y = 0"], a: "y = 2" },
+                    { q: "Suku tengah dari barisan aritmatika: 3, 7, 11, ..., 51 adalah...", options: ["25", "27", "29", "31"], a: "27" },
+                    { q: "Nilai dari tan 45° adalah...", options: ["0", "0.5", "1", "Tak terhingga"], a: "1" },
+                    { q: "Jika f(x) = x³ dan g(x) = 2x, maka (f ∘ g)(2) adalah...", options: ["16", "32", "64", "8"], a: "64" },
+                    { q: "Persamaan lingkaran dengan pusat (0,0) dan jari-jari r = 5 adalah...", options: ["x² + y² = 25", "x² + y² = 5", "x + y = 25", "x² - y² = 25"], a: "x² + y² = 25" },
+                    { q: "Nilai dari ₂C₅ (kombinasi 2 dari 5) adalah...", options: ["10", "20", "5", "15"], a: "10" }
+                ]
+            },
+            bahasa: {
+                sd: [
+                    { q: "Lawan kata dari 'Besar' adalah...", options: ["Tinggi", "Kecil", "Luas", "Panjang"], a: "Kecil" },
+                    { q: "Lawan kata dari 'Panjang' adalah...", options: ["Pendek", "Tinggi", "Kecil", "Luas"], a: "Pendek" },
+                    { q: "Sinonim (persamaan kata) dari 'Rajin' adalah...", options: ["Malas", "Giat", "Pintar", "Bodoh"], a: "Giat" },
+                    { q: "Hewan yang hidup di air dan bernapas dengan insang adalah...", options: ["Kucing", "Ikan", "Burung", "Kelinci"], a: "Ikan" },
+                    { q: "Huruf vokal dalam abjad bahasa Indonesia berjumlah...", options: ["4", "5", "6", "7"], a: "5" },
+                    { q: "Bagian awal dari sebuah cerita disebut...", options: ["Pendahuluan / Orientasi", "Klimaks", "Resolusi", "Koda"], a: "Pendahuluan / Orientasi" },
+                    { q: "Kata tanya untuk menanyakan tempat adalah...", options: ["Siapa", "Mengapa", "Di mana", "Berapa"], a: "Di mana" },
+                    { q: "Ibu kota negara Indonesia adalah...", options: ["Bandung", "Surabaya", "Jakarta", "Medan"], a: "Jakarta" },
+                    { q: "Kalimat yang diakhiri dengan tanda tanya (?) disebut kalimat...", options: ["Perintah", "Tanya", "Pernyataan", "Seruan"], a: "Tanya" },
+                    { q: "Pesan moral dalam sebuah cerita fabel disebut...", options: ["Tema", "Amanat", "Latar", "Tokoh"], a: "Amanat" },
+                    { q: "Lawan kata dari 'Bersih' adalah...", options: ["Rapi", "Kotor", "Indah", "Wangi"], a: "Kotor" },
+                    { q: "Alat musik tradisional kecapi dimainkan dengan cara...", options: ["Ditiup", "Dipukul", "Dipetik", "Digesek"], a: "Dipetik" },
+                    { q: "Orang yang bekerja menanam padi di sawah disebut...", options: ["Nelayan", "Petani", "Guru", "Dokter"], a: "Petani" },
+                    { q: "Persamaan kata dari 'Indah' adalah...", options: ["Elok / Cantik", "Buruk", "Gelap", "Bising"], a: "Elok / Cantik" },
+                    { q: "Bunga nasional Indonesia disebut juga sebagai puspa bangsa, yaitu...", options: ["Melati putih", "Anggrek bulan", "Rafflesia", "Mawar"], a: "Melati putih" },
+                    { q: "Dongeng tentang binatang disebut juga...", options: ["Legenda", "Mite", "Fabel", "Sage"], a: "Fabel" },
+                    { q: "Ibu dari ayah atau ibu kita biasa dipanggil...", options: ["Bibiku", "Nenek", "Tante", "Kakak"], a: "Nenek" },
+                    { q: "Lawan kata dari 'Cepat' adalah...", options: ["Lambat", "Kuat", "Tinggi", "Berat"], a: "Lambat" },
+                    { q: "Penulisan huruf kapital yang benar untuk nama orang adalah...", options: ["budi", "BUDI", "Budi", "bUdi"], a: "Budi" },
+                    { q: "Alat indra manusia yang digunakan untuk mengecap rasa adalah...", options: ["Mata", "Telinga", "Lidah", "Hidung"], a: "Lidah" }
+                ],
+                smp: [
+                    { q: "Sinonim dari kata 'Canggih' adalah...", options: ["Kuno", "Modern / Mutakhir", "Rumit", "Lambat"], a: "Modern / Mutakhir" },
+                    { q: "Sinonim dari kata 'Optimal' adalah...", options: ["Maksimal / Terbaik", "Minimal", "Sedang", "Buruk"], a: "Maksimal / Terbaik" },
+                    { q: "Struktur teks narasi terdiri dari orientasi, komplikasi, dan...", options: ["Realisasi", "Resolusi", "Abstraksi", "Koda"], a: "Resolusi" },
+                    { q: "Unsur intrinsik cerita yang menyangkut waktu dan tempat disebut...", options: ["Tema", "Alur", "Latar", "Sudut pandang"], a: "Latar" },
+                    { q: "Kata baku dari 'Apotik' adalah...", options: ["Apotik", "Apotek", "Epotek", "Apoteq"], a: "Apotek" },
+                    { q: "Kata baku dari 'Jadwal' adalah...", options: ["Jadual", "Jadwal", "Zadwal", "Jadual"], a: "Jadwal" },
+                    { q: "Gaya bahasa yang melukiskan sesuatu dengan penggantian nama disebut...", options: ["Metafora", "Personifikasi", "Hiperbola", "Ironi"], a: "Metafora" },
+                    { q: "Puisi lama yang bersajak a-b-a-b disebut...", options: ["Karmina", "Gurindam", "Pantun", "Seloka"], a: "Pantun" },
+                    { q: "Imbuhan ber- di depan kata 'ajar' menjadi...", options: ["Belajar", "Berajar", "Pelajaran", "Mengajar"], a: "Belajar" },
+                    { q: "Kalimat aktif transitif adalah kalimat aktif yang memerlukan objek dan dapat diubah menjadi...", options: ["Kalimat pasif", "Kalimat tanya", "Kalimat perintah", "Kalimat langsung"], a: "Kalimat pasif" },
+                    { q: "Makna denotatif adalah makna...", options: ["Kiasan", "Sebenarnya", "Ganda", "Sindiran"], a: "Sebenarnya" },
+                    { q: "Laporan hasil pengamatan sering disebut juga dengan teks...", options: ["Eksposisi", "Laporan hasil observasi", "Negosiasi", "Prosedur"], a: "Laporan hasil observasi" },
+                    { q: "Kata hubung (konjungsi) penanda pertentangan adalah...", options: ["Dan", "Tetapi", "Karena", "Sehingga"], a: "Tetapi" },
+                    { q: "Tokoh utama dalam sebuah cerita yang berwatak baik disebut...", options: ["Antagonis", "Protagonis", "Tritagonis", "Figuran"], a: "Protagonis" },
+                    { q: "Penulisan gelar akademik yang benar menurut EYD adalah...", options: ["Dr. Budi, S.H.", "dr Budi SH", "Dokter Budi, S.h", "Dr Budi. SH"], a: "Dr. Budi, S.H." },
+                    { q: "Gaya bahasa yang melebih-lebihkan suatu keadaan disebut...", options: ["Hiperbola", "Personifikasi", "Litotes", "Ironi"], a: "Hiperbola" },
+                    { q: "Kata serapan yang benar dari kata bahasa Inggris 'Effective' adalah...", options: ["Epektif", "Efektif", "Epektip", "Efektip"], a: "Efektif" },
+                    { q: "Surat resmi yang dikirimkan oleh instansi kepada instansi lain disebut...", options: ["Surat pribadi", "Surat dinas", "Surat pembaca", "Surat niaga"], a: "Surat dinas" },
+                    { q: "Unsur berita yang menanyakan waktu kejadian adalah...", options: ["Apa", "Siapa", "Kapan", "Mengapa"], a: "Kapan" },
+                    { q: "Karangan bebas yang bersifat pribadi dan mengungkapkan perasaan penulis disebut...", options: ["Esai", "Biografi", "Novel", "Puisi"], a: "Esai" }
+                ],
+                sma: [
+                    { q: "Teks yang berisi pendapat disertai argumen disebut...", options: ["Negosiasi", "Eksposisi", "Debat / Argumentasi", "Prosedur"], a: "Debat / Argumentasi" },
+                    { q: "Teks yang bertujuan meyakinkan pembaca dengan fakta disebut...", options: ["Persuasi", "Eksposisi", "Prosedur", "Anekdot"], a: "Persuasi" },
+                    { q: "Ciri utama dari hikayat adalah bersifat...", options: ["Istanasentris / Anonim", "Ilmiah", "Faktual", "Modern"], a: "Istanasentris / Anonim" },
+                    { q: "Resensi adalah ulasan atau penilaian terhadap sebuah...", options: ["Buku / Karya", "Undang-undang", "Surat resmi", "Pidato"], a: "Buku / Karya" },
+                    { q: "Majas yang menyatakan sesuatu dengan makna yang berlawanan untuk menyindir disebut...", options: ["Ironi", "Hiperbola", "Metafora", "Personifikasi"], a: "Ironi" },
+                    { q: "Kalimat majemuk bertingkat ditandai dengan adanya konjungsi...", options: ["Dan", "Serta", "Karena / Meskipun", "Tetapi"], a: "Karena / Meskipun" },
+                    { q: "Kritik sastra menitikberatkan pada penilaian terhadap...", options: ["Kelebihan dan kekurangan karya", "Harga buku", "Biografi pengarang", "Penerbit buku"], a: "Kelebihan dan kekurangan karya" },
+                    { q: "Unsur intrinsik novel yang berupa sudut pandang pengarang menggunakan kata ganti 'aku' atau 'dia' disebut...", options: ["Alur", "Sudut pandang (Point of View)", "Amanat", "Latar"], a: "Sudut pandang (Point of View)" },
+                    { q: "Penulisan daftar pustaka yang bersumber dari internet harus mencantumkan...", options: ["Waktu akses / URL", "Nama presiden", "Gelar penulis", "Harga buku"], a: "Waktu akses / URL" },
+                    { q: "Novel sejarah tergolong dalam jenis teks...", options: ["Cerita ulang (Rekaman)", "Prosedur", "Eksplanasi", "Eksposisi"], a: "Cerita ulang (Rekaman)" },
+                    { q: "Kalimat yang subjeknya melakukan pekerjaan disebut kalimat...", options: ["Pasif", "Aktif", "Imperatif", "Interrogatif"], a: "Aktif" },
+                    { q: "Kata baku untuk 'Kualitas' adalah...", options: ["Kwalitas", "Kualitas", "Kualitaz", "Kwalitaz"], a: "Kualitas" },
+                    { q: "Bagian akhir dari struktur teks eksposisi adalah...", options: ["Tesis", "Argumentasi", "Penegasan ulang", "Orientasi"], a: "Penegasan ulang" },
+                    { q: "Bentuk puisi baru yang terdiri atas empat baris sebait bersajak a-b-a-b disebut...", options: ["Distichon", "Terzina", "Quatrain", "Quint"], a: "Quatrain" },
+                    { q: "Dalam penulisan surat lamaran pekerjaan, sumber informasi lowongan ditulis di bagian...", options: ["Lampiran", "Alinea pembuka", "Penutup", "Salam pembuka"], a: "Alinea pembuka" },
+                    { q: "Makna konotatif dari kata 'kambing hitam' adalah...", options: ["Kambing berwarna hitam", "Pihak yang dipersalahkan", "Hewan kurban", "Pemimpin kelompok"], a: "Pihak yang dipersalahkan" },
+                    { q: "Prosa fiksi yang alurnya lebih kompleks dari cerpen namun tidak sepanjang novel disebut...", options: ["Novel", "Novlet (Novovelet)", "Dongeng", "Fabel"], a: "Novlet (Novovelet)" },
+                    { q: "Penggunaan bahasa dalam karya sastra yang bermakna kias disebut bahasa...", options: ["Rancu", "Figuratif", "Baku", "Ilmiah"], a: "Figuratif" },
+                    { q: "Unsur kebahasaan dalam teks negosiasi ditandai dengan adanya...", options: ["Bahasa perintah", "Pasangan tuturan", "Kalimat tanya saja", "Istilah kedokteran"], a: "Pasangan tuturan" },
+                    { q: "Teks yang menjelaskan proses terjadinya fenomena alam atau sosial disebut teks...", options: ["Eksplanasi", "Prosedur", "Laporan", "Anekdot"], a: "Eksplanasi" }
+                ]
+            },
+            inggris: {
+                sd: [
+                    { q: "Bahasa Inggris dari buah 'Apel'?", options: ["Banana", "Apple", "Orange", "Grape"], a: "Apple" },
+                    { q: "Bahasa Inggris dari buah 'Pisang'?", options: ["Apple", "Banana", "Mango", "Melon"], a: "Banana" },
+                    { q: "Bahasa Inggris dari warna 'Merah'?", options: ["Blue", "Red", "Green", "Yellow"], a: "Red" },
+                    { q: "Bahasa Inggris dari hewan 'Kucing'?", options: ["Dog", "Cat", "Bird", "Fish"], a: "Cat" },
+                    { q: "Bahasa Inggris dari angka '10'?", options: ["Eight", "Nine", "Ten", "Eleven"], a: "Ten" },
+                    { q: "Bahasa Inggris dari 'Buku'?", options: ["Pen", "Pencil", "Book", "Eraser"], a: "Book" },
+                    { q: "Terjemahan dari 'Good Morning' adalah...", options: ["Selamat siang", "Selamat pagi", "Selamat sore", "Selamat malam"], a: "Selamat pagi" },
+                    { q: "Bahasa Inggris dari 'Matahari'?", options: ["Moon", "Star", "Sun", "Cloud"], a: "Sun" },
+                    { q: "Bahasa Inggris dari warna 'Biru'?", options: ["Red", "Blue", "Pink", "Purple"], a: "Blue" },
+                    { q: "Hewan 'Dog' dalam bahasa Indonesia artinya...", options: ["Kucing", "Anjing", "Sapi", "Kambing"], a: "Anjing" },
+                    { q: "Bahasa Inggris dari 'Air'?", options: ["Milk", "Tea", "Water", "Juice"], a: "Water" },
+                    { q: "Bahasa Inggris dari anggota keluarga 'Ibu' adalah...", options: ["Father", "Mother", "Sister", "Brother"], a: "Mother" },
+                    { q: "Berapa bahasa Inggris dari angka '5'?", options: ["Four", "Five", "Six", "Seven"], a: "Five" },
+                    { q: "Bahasa Inggris dari 'Sekolah'?", options: ["House", "School", "Hospital", "Market"], a: "School" },
+                    { q: "Bahasa Inggris dari buah 'Jeruk'?", options: ["Orange", "Apple", "Melon", "Mango"], a: "Orange" },
+                    { q: "Bahasa Inggris dari warna 'Hijau'?", options: ["Green", "Yellow", "Blue", "White"], a: "Green" },
+                    { q: "Terjemahan dari 'Thank you' adalah...", options: ["Tolong", "Terima kasih", "Permisi", "Sampai jumpa"], a: "Terima kasih" },
+                    { q: "Bahasa Inggris dari 'Mobil'?", options: ["Bike", "Car", "Bus", "Plane"], a: "Car" },
+                    { q: "Bahasa Inggris dari hewan 'Burung'?", options: ["Bird", "Fish", "Cat", "Duck"], a: "Bird" },
+                    { q: "Bahasa Inggris dari 'Meja'?", options: ["Chair", "Table", "Door", "Window"], a: "Table" }
+                ],
+                smp: [
+                    { q: "Past tense dari 'go' adalah...", options: ["Goed", "Gone", "Went", "Going"], a: "Went" },
+                    { q: "Past tense dari 'eat' adalah...", options: ["Eaten", "Ate", "Eating", "Eats"], a: "Ate" },
+                    { q: "Bentuk V3 (Past Participle) dari kata 'write' adalah...", options: ["Wrote", "Written", "Writing", "Writes"], a: "Written" },
+                    { q: "Opposite (lawan kata) dari 'Big' adalah...", options: ["Small", "Tall", "Short", "Long"], a: "Small" },
+                    { q: "Synonym dari kata 'Smart' adalah...", options: ["Clever", "Lazy", "Sad", "Bad"], a: "Clever" },
+                    { q: "She ... to school every day. (Simple present)", options: ["go", "goes", "gone", "going"], a: "goes" },
+                    { q: "They ... playing football now. (Present continuous)", options: ["is", "am", "are", "be"], a: "are" },
+                    { q: "Comparative degree dari kata 'tall' adalah...", options: ["Taller", "Tallest", "More tall", "Most tall"], a: "Taller" },
+                    { q: "Superlative degree dari kata 'good' adalah...", options: ["Gooder", "Best", "Better", "Most good"], a: "Best" },
+                    { q: "What is the capital city of England?", options: ["Paris", "London", "Sydney", "New York"], a: "London" },
+                    { q: "Modal 'must' digunakan untuk menyatakan...", options: ["Kemampuan", "Keharusan / Kewajiban", "Izin", "Kemungkinan"], a: "Keharusan / Kewajiban" },
+                    { q: "Plural form (bentuk jamak) dari kata 'child' adalah...", options: ["Childs", "Children", "Childes", "Child"], a: "Children" },
+                    { q: "The plural form of 'book' is...", options: ["Book", "Books", "Bookes", "Booki"], a: "Books" },
+                    { q: "Yesterday, I ... my friend at the market.", options: ["meet", "met", "meets", "meeting"], a: "met" },
+                    { q: "Which one is a fruit?", options: ["Carrot", "Potato", "Banana", "Broccoli"], a: "Banana" },
+                    { q: "What do you use to write on the blackboard?", options: ["Chalk", "Pencil", "Eraser", "Ruler"], a: "Chalk" },
+                    { q: "Antonym dari kata 'Hot' adalah...", options: ["Cold", "Warm", "Cool", "Dry"], a: "Cold" },
+                    { q: "We use our ... to listen to music.", options: ["eyes", "ears", "nose", "mouth"], a: "ears" },
+                    { q: "There ... three cats in the room.", options: ["is", "are", "am", "be"], a: "are" },
+                    { q: "My father works in a hospital. He is a...", options: ["Teacher", "Doctor", "Driver", "Farmer"], a: "Doctor" }
+                ],
+                sma: [
+                    { q: "Passive voice: 'They built a new bridge last year'?", options: ["A new bridge was built last year", "A new bridge is built last year", "A new bridge builds last year", "A new bridge has built last year"], a: "A new bridge was built last year" },
+                    { q: "Passive voice: 'She writes a letter'?", options: ["A letter is written by her", "A letter was written by her", "A letter wrote her", "A letter has written"], a: "A letter is written by her" },
+                    { q: "If it rains, I ... at home.", options: ["stay", "stayed", "will stay", "would stay"], a: "will stay" },
+                    { q: "Conditional Type 2: 'If I had money, I ... a new car.'", options: ["will buy", "would buy", "bought", "have bought"], a: "would buy" },
+                    { q: "Reported speech: He said, 'I am happy.' -> He said that he ... happy.", options: ["is", "was", "were", "has been"], a: "was" },
+                    { q: "Synonym dari kata 'Abundant' adalah...", options: ["Scarce", "Plentiful", "Small", "Limited"], a: "Plentiful" },
+                    { q: "Antonym dari kata 'Transparent' adalah...", options: ["Clear", "Opaque", "Bright", "Visible"], a: "Opaque" },
+                    { q: "Gerund (-ing form) berfungsi sebagai...", options: ["Verb", "Noun (Kata Benda)", "Adjective", "Adverb"], a: "Noun (Kata Benda)" },
+                    { q: "The book ... was on the table is mine.", options: ["who", "whom", "which", "where"], a: "which" },
+                    { q: "She has lived in Jakarta ... 5 years.", options: ["since", "for", "during", "from"], a: "for" },
+                    { q: "By next year, I ... graduated from university.", options: ["will graduate", "will have graduated", "graduated", "have graduated"], a: "will have graduated" },
+                    { q: "Despite ... hard, he failed the exam.", options: ["study", "studied", "studying", "studies"], a: "studying" },
+                    { q: "Neither John nor his friends ... coming to the party.", options: ["is", "are", "was", "has"], a: "are" },
+                    { q: "The man ... car was stolen went to the police station.", options: ["who", "whom", "whose", "which"], a: "whose" },
+                    { q: "Idiom 'Break a leg' means...", options: ["Good luck", "Be careful", "Get hurt", "Break something"], a: "Good luck" },
+                    { q: "Choose the correct spelling:", options: ["Accomodate", "Acomodate", "Accommodate", "Acommodate"], a: "Accommodate" },
+                    { q: "Causative verb: 'I had my hair ... yesterday.'", options: ["cut", "cuts", "cutting", "to cut"], a: "cut" },
+                    { q: "The antonym of 'Permanent' is...", options: ["Temporary", "Constant", "Endless", "Eternal"], a: "Temporary" },
+                    { q: "Hardly had I arrived home ... it started to rain.", options: ["when", "than", "then", "after"], a: "when" },
+                    { q: "She suggested that he ... early.", options: ["comes", "come", "came", "coming"], a: "come" }
+                ]
+            },
+            sains: {
+                sd: [
+                    { q: "Tumbuhan bernapas menggunakan bagian...", options: ["Akar", "Batang", "Daun", "Bunga"], a: "Daun" },
+                    { q: "Planet tempat tinggal manusia adalah...", options: ["Mars", "Bumi", "Venus", "Saturnus"], a: "Bumi" },
+                    { q: "Hewan yang memakan tumbuhan dan daging disebut...", options: ["Karnivora", "Herbivora", "Omnivora", "Insektivora"], a: "Omnivora" },
+                    { q: "Alat indra yang digunakan untuk mendengar adalah...", options: ["Mata", "Telinga", "Kulit", "Hidung"], a: "Telinga" },
+                    { q: "Wujud air di dalam es batu adalah...", options: ["Padat", "Cair", "Gas", "Plasma"], a: "Padat" },
+                    { q: "Sumber energi terbesar di bumi adalah...", options: ["Bensin", "Matahari", "Angin", "Batu bara"], a: "Matahari" },
+                    { q: "Perubahan wujud dari cair menjadi padat disebut...", options: ["Mencair", "Membeku", "Menguap", "Menyublim"], a: "Membeku" },
+                    { q: "Hewan yang mengalami metamorfosis sempurna adalah...", options: ["Kecoa", "Kupu-kupu", "Belalang", "Kucing"], a: "Kupu-kupu" },
+                    { q: "Bagian tumbuhan yang berfungsi menyerap air dari tanah adalah...", options: ["Daun", "Batang", "Akar", "Bunga"], a: "Akar" },
+                    { q: "Benda langit yang memantulkan cahaya matahari pada malam hari adalah...", options: ["Bintang", "Bulan", "Meteor", "Komet"], a: "Bulan" },
+                    { q: "Organ tubuh manusia yang berfungsi memompa darah adalah...", options: ["Paru-paru", "Jantung", "Hati", "Ginjal"], a: "Jantung" },
+                    { q: "Hewan yang aktif mencari makan pada malam hari disebut...", options: ["Diurnal", "Nocturnal", "Amfibi", "Karnivora"], a: "Nocturnal" },
+                    { q: "Contoh gaya magnet adalah tarikan antara magnet dengan...", options: ["Kayu", "Plastik", "Besi", "Kertas"], a: "Besi" },
+                    { q: "Terjadinya siang dan malam disebabkan oleh... bumi.", options: ["Revolusi", "Rotasi", "Gravitasi", "Orbit"], a: "Rotasi" },
+                    { q: "Hewan yang hidup di dua alam (darat dan air) disebut...", options: ["Mamalia", "Reptil", "Amfibi", "Aves"], a: "Amfibi" },
+                    { q: "Penyakit kurang darah disebut...", options: ["Anemia", "Hipertensi", "Diabetes", "Asma"], a: "Anemia" },
+                    { q: "Lapisan udara yang menyelimuti bumi disebut...", options: ["Litosfer", "Atmosfer", "Hidrosfer", "Biosfer"], a: "Atmosfer" },
+                    { q: "Alat untuk mengukur suhu tubuh adalah...", options: ["Barometer", "Termometer", "Anemometer", "Spigmomanometer"], a: "Termometer" },
+                    { q: "Proses pembuatan makanan pada tumbuhan hijau dinamakan...", options: ["Respirasi", "Fotosintesis", "Ekskresi", "Transpirasi"], a: "Fotosintesis" },
+                    { q: "Gaya tarik bumi terhadap benda-benda disebut gaya...", options: ["Gesek", "Pegas", "Gravitasi", "Otot"], a: "Gravitasi" }
+                ],
+                smp: [
+                    { q: "Organ pencernaan penyerap sari makanan adalah...", options: ["Lambung", "Usus besar", "Usus halus", "Kerongkongan"], a: "Usus halus" },
+                    { q: "Satuan Internasional (SI) untuk suhu adalah...", options: ["Celcius", "Fahrenheit", "Kelvin", "Reamur"], a: "Kelvin" },
+                    { q: "Pusat pengendali seluruh aktivitas sel di dalam tubuh adalah...", options: ["Sitoplasma", "Nukleus (Inti sel)", "Membran sel", "Mitokondria"], a: "Nukleus (Inti sel)" },
+                    { q: "Hukum kekekalan energi menyatakan bahwa energi tidak dapat...", options: ["Diciptakan dan dimusnahkan", "Diubah bentuknya", "Disimpan", "Dihasilkan"], a: "Diciptakan dan dimusnahkan" },
+                    { q: "Lapisan pelindung bumi dari sinar ultraviolet matahari adalah...", options: ["Ozon", "Oksigen", "Karbon dioksida", "Nitrogen"], a: "Ozon" },
+                    { q: "Alat optik yang digunakan untuk melihat benda sangat kecil (mikro) adalah...", options: ["Teleskop", "Mikroskop", "Periskop", "Lup"], a: "Mikroskop" },
+                    { q: "Zat pewarna alami pada daun hijau adalah...", options: ["Karoten", "Klorofil", "Antosianin", "Xantofil"], a: "Klorofil" },
+                    { q: "Unsur kimia dengan lambang 'O' adalah...", options: ["Emas", "Oksigen", "Osmium", "Ozon"], a: "Oksigen" },
+                    { q: "Tekanan zat cair yang diam disebut ilmu...", options: ["Hidrodinamika", "Hidrostatis", "Aerodinamika", "Termodinamika"], a: "Hidrostatis" },
+                    { q: "Organ pernapasan manusia tempat pertukaran oksigen dan karbon dioksida adalah...", options: ["Bronkus", "Alveolus", "Trakea", "Laring"], a: "Alveolus" },
+                    { q: "Penyakit keturunan berupa sukar membeku darahnya saat luka disebut...", options: ["Hemofilia", "Leukemia", "Anemia", "Thalassemia"], a: "Hemofilia" },
+                    { q: "Bumi mengelilingi matahari disebut...", options: ["Rotasi bumi", "Revolusi bumi", "Rotasi bulan", "Revolusi bulan"], a: "Revolusi bumi" },
+                    { q: "Gaya yang timbul karena sentuhan dua permukaan benda disebut gaya...", options: ["Gravitasi", "Magnet", "Gesek", "Listrik"], a: "Gesek" },
+                    { q: "Satuan daya listrik dalam SI adalah...", options: ["Volt", "Ampere", "Watt", "Joule"], a: "Watt" },
+                    { q: "Bagian mata yang berfungsi mengatur jumlah cahaya yang masuk adalah...", options: ["Kornea", "Iris / Pupil", "Retina", "Lensa"], a: "Iris / Pupil" },
+                    { q: "pH untuk larutan netral adalah...", options: ["Kurang dari 7", "Lebih dari 7", "Tepat 7", "0"], a: "Tepat 7" },
+                    { q: "Gempa bumi yang diakibatkan oleh aktivitas gunung berapi disebut gempa...", options: ["Tektonik", "Vulkanik", "Runtuhan", "Tsunami"], a: "Vulkanik" },
+                    { q: "Simbiosis antara lebah dan bunga adalah contoh simbiosis...", options: ["Mutualisme", "Komensalisme", "Parasitisme", "Amensalisme"], a: "Mutualisme" },
+                    { q: "Unsur kimia dengan lambang 'Fe' adalah...", options: ["Besi", "Fosfor", "Fluorin", "Fermium"], a: "Besi" },
+                    { q: "Alat untuk mengukur kuat arus listrik adalah...", options: ["Voltmeter", "Amperemeter", "Ohmmeter", "Multitester"], a: "Amperemeter" }
+                ],
+                sma: [
+                    { q: "Organel sel penghasil energi (ATP) adalah...", options: ["Ribosom", "Mitokondria", "Badan Golgi", "Lisosom"], a: "Mitokondria" },
+                    { q: "Hukum Newton tentang F = m × a adalah hukum ke...", options: ["Pertama", "Kedua", "Ketiga", "Keempat"], a: "Kedua" },
+                    { q: "Enzim pencernaan di lambung yang memecah protein menjadi pepton adalah...", options: ["Ptyalin", "Pepsin", "Amilase", "Lipase"], a: "Pepsin" },
+                    { q: "Reaksi kimia yang menyerap kalor/panas dari lingkungan disebut reaksi...", options: ["Eksoterm", "Endoterm", "Oksidasi", "Reduksi"], a: "Endoterm" },
+                    { q: "Jaringan tumbuhan yang berfungsi mengangkut air dan mineral dari akar ke daun adalah...", options: ["Floem", "Xilem", "Kambium", "Parenkim"], a: "Xilem" },
+                    { q: "Bapak Genetika dunia yang terkenal dengan percobaan persilangan kacang ercis adalah...", options: ["Charles Darwin", "Gregor Mendel", "Louis Pasteur", "Robert Hooke"], a: "Gregor Mendel" },
+                    { q: "Partikel subatomik yang bermuatan negatif disebut...", options: ["Proton", "Neutron", "Elektron", "Positron"], a: "Elektron" },
+                    { q: "Hormon yang mengatur kadar gula darah dalam tubuh manusia adalah...", options: ["Adrenalin", "Insulin", "Tiroksin", "Estrogen"], a: "Insulin" },
+                    { q: "Gelombang yang tidak memerlukan medium perantara untuk merambat adalah gelombang...", options: ["Mekanik", "Elektromagnetik", "Transversal", "Longitudinal"], a: "Elektromagnetik" },
+                    { q: "Proses pembelahan sel yang menghasilkan sel anak dengan jumlah kromosom setengah dari induknya adalah...", options: ["Mitosis", "Meiosis", "Amitosis", "Finesis"], a: "Meiosis" },
+                    { q: "Tekanan uap jenuh pelarut murni lebih tinggi daripada tekanan uap jenuh larutan. Pernyataan ini sesuai dengan hukum...", options: ["Raoult", "Boyle", "Charles", "Gay-Lussac"], a: "Raoult" },
+                    { q: "Organisasi kehidupan terkecil yang menyusun makhluk hidup adalah...", options: ["Jaringan", "Organ", "Sel", "Sistem organ"], a: "Sel" },
+                    { q: "Besaran fisika yang memiliki nilai dan arah disebut besaran...", options: ["Skalar", "Vektor", "Pokok", "Turunan"], a: "Vektor" },
+                    { q: "Senyawa hidrokarbon jenuh dengan ikatan tunggal disebut...", options: ["Alkiena", "Alkuna", "Alkana", "Alkohol"], a: "Alkana" },
+                    { q: "Bagian otak manusia yang mengatur keseimbangan tubuh adalah...", options: ["Otak besar (Serebrum)", "Otak kecil (Serebelum)", "Sumsum lanjutan", "Pons"], a: "Otak kecil (Serebelum)" },
+                    { q: "Efek rumah kaca disebabkan oleh meningkatnya kadar gas... di atmosfer.", options: ["Oksigen", "Karbon dioksida (CO₂)", "Nitrogen", "Helium"], a: "Karbon dioksida (CO₂)" },
+                    { q: "Katalisator dalam reaksi kimia berfungsi untuk...", options: ["Mempercepat reaksi", "Menghentikan reaksi", "Menambah produk", "Mengurangi suhu"], a: "Mempercepat reaksi" },
+                    { q: "Nilai percepatan gravitasi bumi rata-rata adalah...", options: ["9.8 m/s²", "5.0 m/s²", "20 m/s²", "1 m/s²"], a: "9.8 m/s²" },
+                    { q: "Pewarisan sifat makhluk hidup dikendalikan oleh bahan genetik yaitu...", options: ["DNA dan RNA", "Protein", "Karbohidrat", "Lemak"], a: "DNA dan RNA" },
+                    { q: "Cacat mata rabun jauh (miopi) dapat ditolong dengan menggunakan kacamata lensa...", options: ["Cembung (Plus)", "Cekung (Minus)", "Silindris", "Rangkap"], a: "Cekung (Minus)" }
+                ]
+            },
+            sejarah: {
+                sd: [
+                    { q: "Hari Kemerdekaan RI diperingati setiap tanggal...", options: ["1 Juni", "17 Agustus", "28 Oktober", "10 November"], a: "17 Agustus" },
+                    { q: "Tokoh pembaca teks Proklamasi RI adalah...", options: ["Moh. Hatta", "Soekarno", "Ki Hajar", "Soedirman"], a: "Soekarno" },
+                    { q: "Ibu kota negara Indonesia saat proklamasi kemerdekaan adalah...", options: ["Bandung", "Jakarta", "Yogyakarta", "Surabaya"], a: "Jakarta" },
+                    { q: "Pahlawan wanita asal Aceh yang berjuang melawan penjajah adalah...", options: ["R.A. Kartini", "Cut Nyak Dien", "Dewi Sartika", "Fatmawati"], a: "Cut Nyak Dien" },
+                    { q: "Sumpah Pemuda diikrarkan pada tanggal...", options: ["28 Oktober 1928", "17 Agustus 1945", "20 Mei 1908", "1 Juni 1945"], a: "28 Oktober 1928" },
+                    { q: "Dasar negara Republik Indonesia adalah...", options: ["UUD 1945", "Pancasila", "Bhinneka Tunggal Ika", "Garuda Pancasila"], a: "Pancasila" },
+                    { q: "Lagu kebangsaan Indonesia adalah...", options: ["Garuda Pancasila", "Indonesia Raya", "Halo Halo Bandarlampung", "Bagimu Negeri"], a: "Indonesia Raya" },
+                    { q: "Hari Pahlawan diperingati setiap tanggal...", options: ["21 April", "2 Mei", "10 November", "28 Oktober"], a: "10 November" },
+                    { q: "Tokoh pelopor emansipasi wanita Indonesia adalah...", options: ["Cut Nyak Dien", "R.A. Kartini", "Dewi Sartika", "Martha Christina"], a: "R.A. Kartini" },
+                    { q: "Bendera Negara Indonesia berwarna...", options: ["Merah Putih", "Merah Biru", "Putih Hijau", "Merah Kuning"], a: "Merah Putih" },
+                    { q: "Gelar Bapak Pendidikan Nasional diberikan kepada...", options: ["Soekarno", "Ki Hajar Dewantara", "Sudirman", "H.O.S. Cokroaminoto"], a: "Ki Hajar Dewantara" },
+                    { q: "Pulau terbesar di Indonesia adalah...", options: ["Jawa", "Sumatra", "Kalimantan", "Papua"], a: "Kalimantan" },
+                    { q: "Kerajaan Hindu tertua di Indonesia adalah...", options: ["Tarumanegara", "Kutai", "Majapahit", "Sriwijaya"], a: "Kutai" },
+                    { q: "Uang kertas pecahan Rp1.000 bergambar pahlawan nasional...", options: ["Kapitan Pattimura", "Cut Meutia", "Imam Bonjol", "Sultan Hasanuddin"], a: "Kapitan Pattimura" },
+                    { q: "Candi Borobudur terletak di provinsi...", options: ["Jawa Barat", "Jawa Tengah", "Jawa Timur", "DI Yogyakarta"], a: "Jawa Tengah" },
+                    { q: "Organisasi pergerakan Budi Utomo didirikan pada tanggal 20 Mei diperingati sebagai hari...", options: ["Kebangkitan Nasional", "Pahlawan", "Sumpah Pemuda", "Kesaktian Pancasila"], a: "Kebangkitan Nasional" },
+                    { q: "Mata uang negara Indonesia adalah...", options: ["Ringgit", "Dollar", "Rupiah", "Yen"], a: "Rupiah" },
+                    { q: "Semboyan negara Indonesia adalah...", options: ["Tut Wuri Handayani", "Bhinneka Tunggal Ika", "17 Agustus 1945", "Garuda Pancasila"], a: "Bhinneka Tunggal Ika" },
+                    { q: "Monumen Nasional (Monas) terletak di kota...", options: ["Bandung", "Jakarta", "Bogor", "Semarang"], a: "Jakarta" },
+                    { q: "Tokoh yang menjahit Bendera Pusaka Merah Putih adalah...", options: ["Ibu Fatmawati", "Cut Nyak Dien", "R.A. Kartini", "SK Trimurti"], a: "Ibu Fatmawati" }
+                ],
+                smp: [
+                    { q: "Candi Borobudur peninggalan kerajaan...", options: ["Hindu", "Buddha", "Islam", "Kristen"], a: "Buddha" },
+                    { q: "Organisasi pergerakan nasional pertama tanggal 20 Mei 1908 adalah...", options: ["Budi Utomo", "Sarekat Islam", "Indische Partij", "Muhammadiyah"], a: "Budi Utomo" },
+                    { q: "Perjanjian Linggarjati ditandatangani antara Indonesia dengan negara...", options: ["Belanda", "Inggris", "Jepang", "Sekutu"], a: "Belanda" },
+                    { q: "Raja terkenal dari Kerajaan Majapahit yang membawa pada masa kejayaan adalah...", options: ["Hayam Wuruk", "Mulawarman", "Purnawarman", "Sanjaya"], a: "Hayam Wuruk" },
+                    { q: "Penjelajah samudra asal Portugis yang pertama kali mendarat di Malaka adalah...", options: ["Dafonso de Albuquerque", "Vasco da Gama", "Columbus", "Magelhaens"], a: "Dafonso de Albuquerque" },
+                    { q: "Sistem tanam paksa (Cultuurstelsel) di Indonesia dicetuskan oleh...", options: ["Daendels", "Raffles", "Johannes van den Bosch", "J.P. Coen"], a: "Johannes van den Bosch" },
+                    { q: "Sidang BPUPKI pertama membahas tentang...", options: ["Dasar negara", "UUD 1945", "Kemerdekaan", "Pemilu"], a: "Dasar negara" },
+                    { q: "Peristiwa Rengasdengklok dilatarbelakangi oleh...", options: ["Perbedaan pendapat golongan tua dan muda tentang proklamasi", "Serangan tentara Jepang", "Kekalahan Sekutu", "Pemberontakan PETA"], a: "Perbedaan pendapat golongan tua dan muda tentang proklamasi" },
+                    { q: "Kerajaan Islam pertama di pulau Jawa adalah...", options: ["Demak", "Samudera Pasai", "Mataram Islam", "Banten"], a: "Demak" },
+                    { q: "Pemberontakan G30S/PKI terjadi pada tahun...", options: ["1945", "1955", "1965", "1975"], a: "1965" },
+                    { q: "Gubernur Jenderal VOC pertama di Batavia adalah...", options: ["J.P. Coen", "Daendels", "Raffles", "Van den Bosch"], a: "J.P. Coen" },
+                    { q: "Nama lain dari masa Demokrasi Terpimpin di Indonesia adalah masa kepemimpinan Presiden...", options: ["Soekarno", "Soeharto", "B.J. Habibie", "Abdurrahman Wahid"], a: "Soekarno" },
+                    { q: "Kitab Bharatayuda ditulis oleh...", options: ["Mpu Prapanca", "Mpu Tantular", "Mpu Sedah dan Mpu Panuluh", "Mpu Kanwa"], a: "Mpu Sedah dan Mpu Panuluh" },
+                    { q: "Konferensi Meja Bundar (KMB) dilaksanakan di kota...", options: ["Den Haag", "Jakarta", "Tokyo", "London"], a: "Den Haag" },
+                    { q: "Patih terkenal dari Kerajaan Majapahit yang mengucapkan Sumpah Palapa adalah...", options: ["Gajah Mada", "Adityawarman", "Kebo Iwa", "Ken Arok"], a: "Gajah Mada" },
+                    { q: "Sartika adalah tokoh pendiri Sakola Istri di kota...", options: ["Bandung", "Garut", "Bogor", "Tasikmalaya"], a: "Bandung" },
+                    { q: "Tujuan utama kedatangan bangsa Eropa ke Nusantara adalah memburu...", options: ["Rempah-rempah", "Emas dan perak", "Kain sutra", "Biji kopi"], a: "Rempah-rempah" },
+                    { q: "BPUPKI dibubarkan oleh Jepang dan digantikan oleh...", options: ["PPKI", "KNIP", "MPRS", "DPR"], a: "PPKI" },
+                    { q: "Perang Diponegoro (Perang Jawa) berlangsung pada tahun...", options: ["1825 - 1830", "1908 - 1912", "1945 - 1949", "1811 - 1816"], a: "1825 - 1830" },
+                    { q: "Gelar 'Ayam Jantan dari Timur' diberikan kepada...", options: ["Sultan Hasanuddin", "Sultan Agung", "Pangeran Diponegoro", "Sultan Iskandar Muda"], a: "Sultan Hasanuddin" }
+                ],
+                sma: [
+                    { q: "Perang Dunia II di Asia Pasifik dimulai dengan pengeboman kota...", options: ["Hiroshima & Nagasaki", "Pearl Harbor", "Tokyo", "Berlin"], a: "Pearl Harbor" },
+                    { q: "Sistem tanam paksa dicetuskan oleh...", options: ["Daendels", "Raffles", "Johannes van den Bosch", "J.P. Coen"], a: "Johannes van den Bosch" },
+                    { q: "Latar belakang lahirnya Orde Baru di Indonesia ditandai dengan adanya...", options: ["Supersemar", "Dekrit Presiden 1959", "Sumpah Pemuda", "Proklamasi"], a: "Supersemar" },
+                    { q: "Perjanjian yang mengakhiri Perang Dunia I adalah perjanjian...", options: ["Versailles", "Linggarjati", "Renville", "Bongaya"], a: "Versailles" },
+                    { q: "Politik Etis (Politik Balas Budi) yang dicetuskan oleh Van Deventer meliputi irigasi, emigrasi, dan...", options: ["Edukasi", "Industrialisasi", "Kolonisasi", "Modernisasi"], a: "Edukasi" },
+                    { q: "Revolusi Hijau di bidang pertanian ditandai dengan penggunaan...", options: ["Teknologi dan bibit unggul", "Sistem tebas", "Tenaga kerbau", "Pupuk kandang tradisional"], a: "Teknologi dan bibit unggul" },
+                    { q: "Organisasi pertahanan militer bentukan Jepang yang anggotanya pemuda Indonesia disebut...", options: ["PETA", "Heiho", "Keibodan", "Fujinkai"], a: "PETA" },
+                    { q: "Tokoh pelopor reformasi gereja (Reformasi Protestan) di Eropa adalah...", options: ["Martin Luther", "John Calvin", "Galileo Galilei", "Thomas Aquinas"], a: "Martin Luther" },
+                    { q: "Pusat peradaban kuno Lembah Sungai Nil terletak di negara...", options: ["Mesir", "Irak", "India", "China"], a: "Mesir" },
+                    { q: "Jalur sutra adalah jalur perdagangan kuno yang menghubungkan antara daratan...", options: ["Asia dan Eropa", "Afrika dan Amerika", "Australia dan Asia", "Eropa dan Afrika"], a: "Asia dan Eropa" },
+                    { q: "Dekrit Presiden 5 Juli 1959 berisi tentang...", options: ["Kembali ke UUD 1945", "Pembubaran DPR", "Pemilu bebas", "Pembentukan RIS"], a: "Kembali ke UUD 1945" },
+                    { q: "Peristiwa jatuhnya kota Konstantinopel ke tangan Turki Usmani pada tahun 1453 menyebabkan...", options: ["Bangsa Eropa mencari jalur rempah ke timur", "Perang salib berakhir", "Terbentuknya PBB", "Keruntuhan Romawi kuno"], a: "Bangsa Eropa mencari jalur rempah ke timur" },
+                    { q: "Blok Barat dalam Perang Dingin dipimpin oleh...", options: ["Amerika Serikat", "Uni Soviet", "Inggris", "Jerman"], a: "Amerika Serikat" },
+                    { q: "Peristiwa Bandung Lautan Api terjadi pada tanggal...", options: ["24 Maret 1946", "10 November 1945", "1 Maret 1949", "17 Agustus 1945"], a: "24 Maret 1946" },
+                    { q: "Politik pintu terbuka (Open Door Policy) di Hindia Belanda mulai diberlakukan tahun...", options: ["1870", "1830", "1908", "1928"], a: "1870" },
+                    { q: "Perjanjian Renville ditandatangani di atas kapal perang milik negara...", options: ["Amerika Serikat", "Inggris", "Belanda", "Australia"], a: "Amerika Serikat" },
+                    { q: "Masa demokrasi parlementer di Indonesia dimulai sejak tahun 1950 hingga dikeluarkannya...", options: ["Dekrit Presiden 1959", "Supersemar", "Amandemen UUD", "Tritura"], a: "Dekrit Presiden 1959" },
+                    { q: "Pergerakan nasional Indische Partij didirikan oleh Tiga Serangkai, yaitu Douwes Dekker, Tjipto Mangoenkoesoemo, dan...", options: ["Ki Hajar Dewantara", "Soekarno", "Hatta", "Sartika"], a: "Ki Hajar Dewantara" },
+                    { q: "Perang Dingin (Cold War) berakhir ditandai dengan runtuhnya...", options: ["Tembok Berlin / Uni Soviet", "Gedung Pentagon", "Uni Eropa", "Kekaisaran Jepang"], a: "Tembok Berlin / Uni Soviet" },
+                    { q: "Paham atau ajaran yang mengagungkan kekuasaan negara secara mutlak disebut...", options: ["Fasisme", "Liberalisme", "Sosialisme", "Demokrasi"], a: "Fasisme" }
+                ]
+            }
+        };
+
+        // State Game
+        let currentMode = 'solo';
+        let currentLevel = 'sd';
+        let currentSubject = 'matematika';
+        let activePlayer = 'p1';
+        let currentQuestionIndex = 0;
+        let scoreP1 = 0;
+        let scoreP2 = 0;
+        let hintAvailable = true;
+        let timer = null;
+        let timeLeft = 15;
+        let activeQuestions = [];
+
+        function goToPage(pageId) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById(pageId).classList.add('active');
+        }
+
+        function selectMode(mode) {
+            currentMode = mode;
+            goToPage('page-level');
+        }
+
+        function selectLevel(level) {
+            currentLevel = level;
+            goToPage('page-subject');
+        }
+
+        function selectSubject(subject) {
+            currentSubject = subject;
+            startQuizGame();
+        }
+
+        function startQuizGame() {
+            activePlayer = 'p1';
+            currentQuestionIndex = 0;
+            scoreP1 = 0;
+            scoreP2 = 0;
+            hintAvailable = true;
+
+            let subObj = databaseSoal[currentSubject][currentLevel];
+            // Mengambil 20 soal secara acak (shuffle) dari pool 20 soal yang tersedia
+            let shuffledPool = [...subObj].sort(() => Math.random() - 0.5);
+            
+            let poolP1 = shuffledPool.slice(0, 20);
+            let poolP2 = currentMode === 'duo' ? [...subObj].sort(() => Math.random() - 0.5).slice(0, 20) : [];
+            
+            activeQuestions = { p1: poolP1, p2: poolP2 };
+            goToPage('page-quiz');
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            clearInterval(timer);
+            timeLeft = 15;
+            document.getElementById('time-left').textContent = timeLeft;
+
+            let qList = activeQuestions[activePlayer];
+            if (currentQuestionIndex >= qList.length) {
+                endGame();
+                return;
+            }
+
+            let currentQ = qList[currentQuestionIndex];
+            
+            let titleStr = currentMode === 'duo' ? `🌸 Kuis (Giliran Player ${activePlayer === 'p1' ? '1' : '2'}) 🌸` : `🌸 Kuis Desa Pelangi 🌸`;
+            document.getElementById('quiz-title').textContent = titleStr;
+            document.getElementById('info-left').textContent = `Soal ${currentQuestionIndex + 1}/${qList.length}`;
+            document.getElementById('info-right').textContent = `Skor: ${activePlayer === 'p1' ? scoreP1 : scoreP2}`;
+            document.getElementById('question-text').textContent = currentQ.q;
+            document.getElementById('feedback').textContent = '';
+
+            let hintBtn = document.getElementById('btn-hint');
+            hintBtn.disabled = !hintAvailable;
+            document.getElementById('hint-count').textContent = hintAvailable ? '1' : '0';
+
+            let shuffledOptions = [...currentQ.options].sort(() => Math.random() - 0.5);
+            let optContainer = document.getElementById('options-container');
+            optContainer.innerHTML = '';
+
+            shuffledOptions.forEach(opt => {
+                let btn = document.createElement('button');
+                btn.className = 'btn-option';
+                btn.textContent = opt;
+                btn.onclick = (e) => checkAnswer(opt, currentQ.a, e);
+                optContainer.appendChild(btn);
+            });
+
+            timer = setInterval(() => {
+                timeLeft--;
+                document.getElementById('time-left').textContent = timeLeft;
+                if (timeLeft <= 0) {
+                    clearInterval(timer);
+                    checkAnswer('', currentQ.a, null);
+                }
+            }, 1000);
+        }
+
+        function checkAnswer(selected, correct, event) {
+            clearInterval(timer);
+            let feedback = document.getElementById('feedback');
+            let buttons = document.querySelectorAll('.options-container button');
+            buttons.forEach(b => b.disabled = true);
+
+            if (selected === correct) {
+                playSound('correct');
+                feedback.style.color = '#2b8a3e';
+                feedback.textContent = "Hore, Jawaban Benar! ⭐";
+                spawnFloatingStars(event);
+
+                if (activePlayer === 'p1') scoreP1 += 10;
+                else scoreP2 += 10;
+            } else {
+                playSound('wrong');
+                feedback.style.color = '#c92a2a';
+                feedback.textContent = selected === '' ? "Waktu Habis! ⏱️" : `Kurang tepat. Jawaban yang benar: ${correct}`;
+                document.getElementById('main-card').classList.add('shake');
+                setTimeout(() => document.getElementById('main-card').classList.remove('shake'), 400);
+            }
+
+            setTimeout(() => {
+                if (currentMode === 'duo') {
+                    activePlayer = activePlayer === 'p1' ? 'p2' : 'p1';
+                    if (activePlayer === 'p1') currentQuestionIndex++;
+                } else {
+                    currentQuestionIndex++;
+                }
+                loadQuestion();
+            }, 1500);
+        }
+
+        function useHint() {
+            if (!hintAvailable) return;
+            hintAvailable = false;
+            document.getElementById('btn-hint').disabled = true;
+            document.getElementById('hint-count').textContent = '0';
+
+            let qList = activeQuestions[activePlayer];
+            let currentQ = qList[currentQuestionIndex];
+            let buttons = document.querySelectorAll('.options-container button');
+            
+            let removedCount = 0;
+            buttons.forEach(b => {
+                if (b.textContent !== currentQ.a && removedCount < 2) {
+                    b.disabled = true;
+                    b.style.opacity = '0.3';
+                    removedCount++;
+                }
+            });
+        }
+
+        function endGame() {
+            goToPage('page-result');
+            let scoreText = document.getElementById('final-score-text');
+            let highScoreText = document.getElementById('high-score-text');
+            let congrats = document.getElementById('congrats-message');
+
+            if (currentMode === 'solo') {
+                scoreText.textContent = `Skor Akhir Kamu: ${scoreP1} Poin! 🌟`;
+
+                // Logika LocalStorage untuk High Score Solo
+                let storageKey = `miraluna_highscore_${currentLevel}_${currentSubject}`;
+                let savedHighScore = localStorage.getItem(storageKey) ? parseInt(localStorage.getItem(storageKey)) : 0;
+
+                if (scoreP1 > savedHighScore) {
+                    localStorage.setItem(storageKey, scoreP1);
+                    highScoreText.textContent = `🏆 REKOR BARU (High Score): ${scoreP1} Poin! 🎉`;
+                } else {
+                    highScoreText.textContent = `🏆 Rekor Tertinggi Kamu: ${savedHighScore} Poin`;
+                }
+
+                congrats.textContent = scoreP1 >= 140 ? "Luar biasa! Kamu sangat pintar dan teliti! 👑🌸" : "Hebat! Terus semangat belajar ya! 💪✨";
+            } else {
+                scoreText.textContent = `Skor Akhir — Player 1: ${scoreP1} | Player 2: ${scoreP2}`;
+                highScoreText.textContent = ""; 
+                if (scoreP1 > scoreP2) congrats.textContent = "🎉 Pemenang: Player 1! Hebat sekali! 🏆";
+                else if (scoreP2 > scoreP1) congrats.textContent = "🎉 Pemenang: Player 2! Luar biasa! 🏆";
+                else congrats.textContent = "Wah, hasil seri! Kalian berdua sama-sama pintar! 🤝💖";
+            }
+        }
+    </script>
+</body>
+</html>
